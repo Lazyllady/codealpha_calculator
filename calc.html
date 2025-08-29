@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Scientific Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
+            background: url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80') no-repeat center center fixed;
+            background-size: cover;
+            padding: 20px;
+        }
+        
+        .calculator {
+            width: 360px;
+            background-color: #22252d;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .display {
+            background-color: #22252d;
+            color: white;
+            padding: 30px 20px 20px;
+            text-align: right;
+            position: relative;
+        }
+        
+        .calculation {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            min-height: 24px;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .result {
+            font-size: 2.5rem;
+            font-weight: 300;
+            min-height: 50px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 1px;
+            background-color: #292d36;
+            padding: 20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+        
+        button {
+            border: none;
+            outline: none;
+            padding: 18px 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background-color: #2a2d37;
+            color: white;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+            background-color: #3b3f4b;
+        }
+        
+        .operator {
+            background-color: #2a2d37;
+            color: #f2a33c;
+        }
+        
+        .function {
+            background-color: #272b33;
+            color: #26fed7;
+            font-size: 1rem;
+        }
+        
+        .equals {
+            background-color: #f2a33c;
+            color: white;
+            grid-column: span 1;
+        }
+        
+        .clear, .backspace {
+            background-color: #272b33;
+            color: #ff7979;
+        }
+        
+        .memory {
+            background-color: #272b33;
+            color: #7cebff;
+        }
+        
+        .history-panel {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .history-panel h3 {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #a0a0a0;
+        }
+        
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #22252d;
+            padding: 0 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            color: #a0a0a0;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            color: #f2a33c;
+            border-bottom: 2px solid #f2a33c;
+
+}
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('calculator')">Calculator</div>
+            <div class="tab" onclick="switchTab('converter')">Converter</div>
+            <div class="tab" onclick="switchTab('constants')">Constants</div>
+        </div>
+        
+        <div id="calculator-section">
+            <div class="display">
+                <div class="calculation"></div>
+                <div class="result">0</div>
+            </div>
+            
+            <div class="buttons">
+                <!-- Row 1 -->
+                <button class="function" onclick="handleFunction('mc')">mc</button>
+                <button class="function" onclick="handleFunction('m+')">m+</button>
+                <button class="function" onclick="handleFunction('m-')">m-</button>
+                <button class="function" onclick="handleFunction('mr')">mr</button>
+                
+                <!-- Row 2 -->
+                <button class="function" onclick="handleFunction('sin')">sin</button>
+                <button class="function" onclick="handleFunction('cos')">cos</button>
+                <button class="function" onclick="handleFunction('tan')">tan</button>
+                <button class="operator" onclick="handleOperator('/')">/</button>
+                
+                <!-- Row 3 -->
+                <button class="function" onclick="handleFunction('log')">log</button>
+                <button class="function" onclick="handleFunction('ln')">ln</button>
+                <button class="function" onclick="handleFunction('sqrt')">√</button>
+                <button class="operator" onclick="handleOperator('*')">×</button>
+                
+                <!-- Row 4 -->
+                <button class="function" onclick="handleFunction('pi')">π</button>
+                <button class="function" onclick="handleFunction('e')">e</button>
+                <button class="function" onclick="handleFunction('^')">x^y</button>
+                <button class="operator" onclick="handleOperator('-')">-</button>
+                
+                <!-- Row 5 -->
+                <button class="clear" onclick="clearAll()">C</button>
+                <button class="backspace" onclick="backspace()">⌫</button>
+                <button class="function" onclick="handleFunction('(')">(</button>
+                <button class="function" onclick="handleFunction(')')">)</button>
+                
+                <!-- Row 6 -->
+                <button onclick="appendNumber(7)">7</button>
+                <button onclick="appendNumber(8)">8</button>
+                <button onclick="appendNumber(9)">9</button>
+                <button class="operator" onclick="handleOperator('+')" style="grid-row: span 2;">+</button>
+                
+                <!-- Row 7 -->
+                <button onclick="appendNumber(4)">4</button>
+                <button onclick="appendNumber(5)">5</button>
+                <button onclick="appendNumber(6)">6</button>
+                
+                <!-- Row 8 -->
+                <button onclick="appendNumber(1)">1</button>
+                <button onclick="appendNumber(2)">2</button>
+                <button onclick="appendNumber(3)">3</button>
+                <button class="equals" onclick="calculate()" style="grid-row: span 2;">=</button>
+                
+                <!-- Row 9 -->
+                <button onclick="appendNumber(0)" style="grid-column: span 2;">0</button>
+                <button onclick="appendDecimal()">.</button>
+            </div>
+            
+            <div class="history-panel">
+                <h3>Calculation History</h3>
+                <div id="history"></div>
+            </div>
+        </div>
+
+        <!-- Converter Section -->
+        <div id="converter-section" style="display:none; padding: 20px;">
+            <h3 style="color:#a0a0a0;">Unit Converter</h3>
+            <div>
+                <input type="number" id="conv-input" placeholder="Value" style="width: 80px;">
+                <select id="conv-from">
+                    <option value="m">Meters</option>
+                    <option value="km">Kilometers</option>
+                    <option value="mi">Miles</option>
+                </select>
+                to
+                <select id="conv-to">
+                    <option value="m">Meters</option>
+                    <option value="km">Kilometers</option>
+                    <option value="mi">Miles</option>
+                </select>
+                <button onclick="convertUnit()">Convert</button>
+            </div>
+            <div id="conv-result" style="margin-top:10px;color:#26fed7;"></div>
+        </div>
+
+        <!-- Constants Section -->
+        <div id="constants-section" style="display:none; padding: 20px;">
+            <h3 style="color:#a0a0a0;">Math & Science Constants</h3>
+            <ul style="color:#26fed7;list-style:none;padding-left:0;">
+                <li>π (Pi): <span id="const-pi"></span></li>
+                <li>e (Euler's Number): <span id="const-e"></span></li>
+                <li>c (Speed of Light): <span id="const-c"></span> m/s</li>
+                <li>G (Gravitational Constant): <span id="const-g"></span> m³/kg/s²</li>
+                <li>h (Planck Constant): <span id="const-h"></span> J·s</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let calculation = '';
+        let result = '';
+        let memory = 0;
+        let history = [];
+        
+        const calculationElement = document.querySelector('.calculation');
+        const resultElement = document.querySelector('.result');
+        const historyElement = document.getElementById('history');
+        
+        function updateDisplay() {
+            resultElement.textContent = currentInput;
+
+calculationElement.textContent = calculation;
+        }
+        
+        function appendNumber(number) {
+            if (currentInput === '0' || result !== '') {
+                currentInput = '';
+                if (result !== '') {
+                    calculation = '';
+                    result = '';
+                }
+            }
+            currentInput += number;
+            updateDisplay();
+        }
+        
+        function appendDecimal() {
+            if (result !== '') {
+                currentInput = '0';
+                calculation = '';
+                result = '';
+            }
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+        
+        function handleOperator(op) {
+            if (result !== '') {
+                calculation = currentInput;
+                result = '';
+            }
+            calculation += currentInput + op;
+            currentInput = '0';
+            updateDisplay();
+        }
+        
+        function handleFunction(func) {
+            switch (func) {
+                case 'sin':
+                    currentInput = Math.sin(parseFloat(currentInput)).toString();
+                    break;
+                case 'cos':
+                    currentInput = Math.cos(parseFloat(currentInput)).toString();
+                    break;
+                case 'tan':
+                    currentInput = Math.tan(parseFloat(currentInput)).toString();
+                    break;
+                case 'log':
+                    currentInput = Math.log10(parseFloat(currentInput)).toString();
+                    break;
+                case 'ln':
+                    currentInput = Math.log(parseFloat(currentInput)).toString();
+                    break;
+                case 'sqrt':
+                    currentInput = Math.sqrt(parseFloat(currentInput)).toString();
+                    break;
+                case 'pi':
+                    currentInput = Math.PI.toString();
+                    break;
+                case 'e':
+                    currentInput = Math.E.toString();
+                    break;
+                case '^':
+                    calculation += currentInput + '**';
+                    currentInput = '0';
+                    break;
+                case '(':
+                    calculation += '(';
+                    break;
+                case ')':
+                    calculation += ')';
+                    break;
+                case 'mc':
+                    memory = 0;
+                    break;
+                case 'm+':
+                    memory += parseFloat(currentInput);
+                    break;
+                case 'm-':
+                    memory -= parseFloat(currentInput);
+                    break;
+                case 'mr':
+                    currentInput = memory.toString();
+                    break;
+            }
+            updateDisplay();
+        }
+        
+        function clearAll() {
+            currentInput = '0';
+            calculation = '';
+            result = '';
+            updateDisplay();
+        }
+        
+        function backspace() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+        
+        function calculate() {
+            try {
+                calculation += currentInput;
+                result = eval(calculation);
+                currentInput = result.toString();
+                
+                // Add to history
+                history.unshift(`${calculation} = ${result}`);
+                if (history.length > 5) history.pop();
+                
+                // Update history display
+                historyElement.innerHTML = '';
+                history.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.classList.add('history-item');
+                    historyItem.textContent = item;
+                    historyElement.appendChild(historyItem);
+                });
+                
+                calculation = '';
+                updateDisplay();
+            } catch (error) {
+                currentInput = 'Error';
+                calculation = '';
+                result = '';
+                updateDisplay();
+            }
+        }
+        
+        // Tab switching logic
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach((el, idx) => {
+                el.classList.remove('active');
+            });
+            if (tab === 'calculator') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('calculator-section').style.display = '';
+                document.getElementById('converter-section').style.display = 'none';
+                document.getElementById('constants-section').style.display = 'none';
+            } else if (tab === 'converter') {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('calculator-section').style.display = 'none';
+                document.getElementById('converter-section').style.display = '';
+                document.getElementById('constants-section').style.display = 'none';
+            } else if (tab === 'constants') {
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                document.getElementById('calculator-section').style.display = 'none';
+                document.getElementById('converter-section').style.display = 'none';
+                document.getElementById('constants-section').style.display = '';
+            }
+        }
+
+        // Simple unit converter (meters, kilometers, miles)
+        function convertUnit() {
+            const input = parseFloat(document.getElementById('conv-input').value);
+            const from = document.getElementById('conv-from').value;
+            const to = document.getElementById('conv-to').value;
+            if (isNaN(input)) {
+                document.getElementById('conv-result').textContent = 'Enter a valid number.';
+                return;
+            }
+            // Convert input to meters first
+            let meters = input;
+            if (from === 'km') meters = input * 1000;
+            if (from === 'mi') meters = input * 1609.34;
+            // Convert meters to target unit
+            let result = meters;
+            if (to === 'km') result = meters / 1000;
+            if (to === 'mi') result = meters / 1609.34;
+            document.getElementById('conv-result').textContent = `${input} ${from} = ${result} ${to}`;
+        }
+
+        // Fill constants
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('const-pi').textContent = Math.PI;
+            document.getElementById('const-e').textContent = Math.E;
+            document.getElementById('const-c').textContent = '299792458';
+            document.getElementById('const-g').textContent = '6.67430e-11';
+            document.getElementById('const-h').textContent = '6.62607015e-34';
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
